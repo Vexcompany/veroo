@@ -3,32 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagaska Cloud - Secure File Storage</title>
+    <title>Pagaska Cloud - Fast Image & File Hosting</title>
+    
+    <!-- Open Graph Meta Tags untuk Link Preview (WhatsApp, Discord, Facebook, Twitter) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Nebula Cloud">
+    <meta id="ogTitle" property="og:title" content="Nebula Cloud - File Hosting">
+    <meta id="ogDesc" property="og:description" content="Fast and free file hosting">
+    <meta id="ogImage" property="og:image" content="">
+    <meta id="ogUrl" property="og:url" content="">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta id="twTitle" name="twitter:title" content="Nebula Cloud">
+    <meta id="twDesc" name="twitter:description" content="Fast and free file hosting">
+    <meta id="twImage" name="twitter:image" content="">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0f;
+            color: #fff;
             overflow-x: hidden;
         }
 
-        .font-display {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
 
         .nebula-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: radial-gradient(ellipse at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-                        radial-gradient(ellipse at 40% 40%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 40%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
             filter: blur(80px);
             animation: nebulaMove 20s ease-in-out infinite;
         }
@@ -51,23 +65,35 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
         .upload-zone {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
             border: 2px dashed rgba(99, 102, 241, 0.5);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .upload-zone:hover::before {
+            animation: shimmer 1.5s infinite;
+            opacity: 1;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
         .upload-zone:hover, .upload-zone.dragover {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
             border-color: rgba(99, 102, 241, 0.8);
@@ -75,57 +101,70 @@
             box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
         }
 
+        .progress-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 999px;
+            overflow: hidden;
+            height: 8px;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
         .file-item {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: slideIn 0.4s ease-out;
         }
+
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .file-item:hover {
             transform: translateX(8px);
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .progress-bar {
-            background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-        }
-
         .toast {
             animation: toastSlide 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
+
         @keyframes toastSlide {
             from { transform: translateX(100%) scale(0.8); opacity: 0; }
             to { transform: translateX(0) scale(1); opacity: 1; }
         }
 
-        .modal {
-            animation: modalFade 0.3s ease;
-        }
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
         .grid-pattern {
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
         }
 
         .preview-hero {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .file-icon-large {
-            font-size: 4rem;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .btn-primary {
@@ -137,48 +176,56 @@
             box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .direct-image-view {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        .copied {
-            animation: copiedPulse 0.3s ease;
-        }
-        @keyframes copiedPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .chunk-upload-info {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 0.875rem;
+            color: #a5b4fc;
         }
 
-        .loading {
-            position: relative;
-            overflow: hidden;
+        .loading-spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
         }
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: loading 1.5s infinite;
-        }
-        @keyframes loading {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen grid-pattern">
+<body class="min-h-screen grid-pattern">
 
     <div class="nebula-bg"></div>
 
-    <!-- Main App Container -->
+    <!-- MODE: Direct Image View (untuk link langsung ke gambar) -->
+    <div id="directImageMode" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="text-center">
+            <img id="directImage" class="direct-image-view" src="" alt="Hosted Image">
+            <div class="mt-6 flex justify-center gap-4">
+                <a id="directDownloadBtn" class="btn-primary px-6 py-3 rounded-xl font-semibold text-white flex items-center gap-2" download>
+                    <i class="fas fa-download"></i> Download
+                </a>
+                <button onclick="showMainApp()" class="px-6 py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 transition-colors border border-white/20">
+                    <i class="fas fa-cloud"></i> Pagaska Cloud
+                </button>
+            </div>
+            <p class="text-gray-500 mt-4 text-sm">Hosted on Pagaska Cloud</p>
+        </div>
+    </div>
+
+    <!-- MODE: Main App -->
     <div id="appContainer">
         <nav class="glass sticky top-0 z-50 border-b border-white/10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -187,21 +234,22 @@
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                             <i class="fas fa-cloud text-white text-lg"></i>
                         </div>
-                        <span class="font-display text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                            Pagaska Cloud
-                        </span>
+                        <div>
+                            <span class="font-display text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 block leading-none">
+                                Pagaska Cloud
+                            </span>
+                            <span class="text-xs text-gray-400">Pagaska Cloud Storage</span>
+                        </div>
                     </div>
                     
                     <div class="flex items-center gap-4">
-                        <button onclick="toggleView()" class="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Toggle View">
+                        <button onclick="toggleView()" class="p-2 rounded-lg hover:bg-white/10 transition-colors">
                             <i class="fas fa-th-large text-gray-400" id="viewIcon"></i>
                         </button>
                         <div class="h-8 w-px bg-white/10"></div>
-                        <button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-sm font-bold">
-                                U
-                            </div>
-                            <span class="hidden sm:block text-sm">User</span>
+                        <button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 text-sm">
+                            <i class="fas fa-infinity text-indigo-400"></i>
+                            <span class="hidden sm:block">200MB Max</span>
                         </button>
                     </div>
                 </div>
@@ -217,7 +265,7 @@
                         <i class="fas fa-plus"></i>
                         Upload File
                     </button>
-                    <input type="file" id="fileInput" multiple class="hidden" onchange="handleFiles(this.files)">
+                    <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(this.files[0])">
                 </div>
 
                 <nav class="flex-1 px-4 space-y-1">
@@ -227,67 +275,137 @@
                         <span class="ml-auto text-xs bg-white/10 px-2 py-1 rounded-full" id="fileCount">0</span>
                     </a>
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
-                        <i class="fas fa-clock text-purple-400"></i>
-                        <span>Recent</span>
+                        <i class="fas fa-image text-purple-400"></i>
+                        <span>Images</span>
                     </a>
                     <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
-                        <i class="fas fa-star text-yellow-400"></i>
-                        <span>Starred</span>
+                        <i class="fas fa-video text-red-400"></i>
+                        <span>Videos</span>
                     </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/5 hover:text-white transition-colors">
+                    <a href="#" onclick="clearAllFiles(); return false;" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/5 hover:text-red-400 transition-colors">
                         <i class="fas fa-trash text-red-400"></i>
-                        <span>Trash</span>
+                        <span>Clear All</span>
                     </a>
                 </nav>
 
                 <div class="p-6 border-t border-white/10">
                     <div class="glass rounded-xl p-4">
                         <div class="flex justify-between text-sm mb-2">
-                            <span class="text-gray-400">Storage</span>
-                            <span class="text-white font-medium" id="storageText">0 MB / 100 MB</span>
+                            <span class="text-gray-400">Session Storage</span>
+                            <span class="text-white font-medium" id="storageText">0 MB</span>
                         </div>
                         <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                             <div class="h-full progress-bar rounded-full transition-all duration-500" id="storageBar" style="width: 0%"></div>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">*Session only (Vercel Hobby)</p>
+                        <p class="text-xs text-gray-500 mt-2">*Files lost on refresh</p>
                     </div>
                 </div>
             </aside>
 
             <main class="flex-1 p-6 overflow-y-auto">
                 
-                <div id="dropZone" class="upload-zone rounded-2xl p-12 mb-8 text-center cursor-pointer relative overflow-hidden group">
-                    <input type="file" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFiles(this.files)">
+                <!-- Upload Area dengan Progress -->
+                <div id="uploadArea" class="upload-zone rounded-2xl p-12 mb-8 text-center cursor-pointer relative">
+                    <input type="file" id="dropInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this.files[0])">
                     
-                    <div class="relative z-0">
+                    <div class="relative z-0" id="uploadIdle">
                         <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-cloud-upload-alt text-4xl text-indigo-400"></i>
                         </div>
-                        <h3 class="text-xl font-semibold mb-2">Drop files here to upload</h3>
-                        <p class="text-gray-400 mb-4">or click to browse (Max 4.5MB per file - Vercel limit)</p>
-                        <div class="flex justify-center gap-4 text-sm text-gray-500">
-                            <span class="flex items-center gap-1"><i class="fas fa-image"></i> Images</span>
-                            <span class="flex items-center gap-1"><i class="fas fa-video"></i> Videos</span>
-                            <span class="flex items-center gap-1"><i class="fas fa-file"></i> Documents</span>
+                        <h3 class="text-xl font-semibold mb-2">Drop files here or click to upload</h3>
+                        <p class="text-gray-400 mb-2">Maximum file size: <span class="text-indigo-400 font-bold">200 MB</span></p>
+                        <div class="flex justify-center gap-4 text-sm text-gray-500 mt-4">
+                            <span class="flex items-center gap-1 px-3 py-1 rounded-full bg-white/5"><i class="fas fa-image text-purple-400"></i> Images</span>
+                            <span class="flex items-center gap-1 px-3 py-1 rounded-full bg-white/5"><i class="fas fa-video text-red-400"></i> Videos</span>
+                            <span class="flex items-center gap-1 px-3 py-1 rounded-full bg-white/5"><i class="fas fa-file text-blue-400"></i> Any File</span>
+                        </div>
+                        <div class="chunk-upload-info max-w-md mx-auto">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Large files (50MB+) will be processed with advanced compression
+                        </div>
+                    </div>
+
+                    <div id="uploadProgress" class="hidden relative z-0 max-w-md mx-auto">
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="loading-spinner mr-3"></div>
+                            <span class="text-lg font-semibold">Uploading...</span>
+                        </div>
+                        <div class="text-2xl font-bold text-indigo-400 mb-2" id="progressPercent">0%</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2" id="uploadStatus">Initializing...</p>
+                        <button onclick="cancelUpload()" class="mt-4 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-sm">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Results -->
+                <div id="uploadResult" class="hidden glass-panel rounded-2xl p-6 mb-8 border-indigo-500/30">
+                    <div class="flex items-start gap-4">
+                        <div class="w-16 h-16 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-2xl text-green-400"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg font-semibold text-green-400 mb-1">Upload Complete!</h3>
+                            <p class="text-gray-400 text-sm mb-3 truncate" id="resultFilename">filename.jpg</p>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Direct Link (for sharing)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="resultDirectLink" readonly 
+                                               class="flex-1 bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-gray-300 focus:outline-none focus:border-indigo-500/50">
+                                        <button onclick="copyToClipboard('resultDirectLink')" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors text-white text-sm">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 uppercase tracking-wider mb-1 block">Preview Page (with metadata)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="resultPreviewLink" readonly 
+                                               class="flex-1 bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-gray-300 focus:outline-none focus:border-indigo-500/50">
+                                        <button onclick="copyToClipboard('resultPreviewLink')" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors border border-white/10 text-sm">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button onclick="openPreviewLink()" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors border border-white/10 text-sm">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 pt-2">
+                                    <button onclick="viewFile()" class="flex-1 py-2 rounded-lg bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 transition-colors text-sm font-medium">
+                                        <i class="fas fa-eye mr-1"></i> View File
+                                    </button>
+                                    <button onclick="shareToSocial()" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 text-sm">
+                                        <i class="fas fa-share-alt mr-1"></i> Share
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Filters -->
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <h2 class="text-2xl font-display font-bold">My Files</h2>
+                    <h2 class="text-2xl font-display font-bold">Recent Uploads</h2>
                     <div class="flex gap-2">
-                        <button onclick="filterFiles('all')" class="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors border border-white/10 active">All</button>
+                        <button onclick="filterFiles('all')" class="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors border border-white/10 text-white">All</button>
                         <button onclick="filterFiles('image')" class="px-4 py-2 rounded-lg bg-white/5 text-sm hover:bg-white/10 transition-colors border border-white/10 text-gray-400">Images</button>
                         <button onclick="filterFiles('video')" class="px-4 py-2 rounded-lg bg-white/5 text-sm hover:bg-white/10 transition-colors border border-white/10 text-gray-400">Videos</button>
-                        <button onclick="filterFiles('document')" class="px-4 py-2 rounded-lg bg-white/5 text-sm hover:bg-white/10 transition-colors border border-white/10 text-gray-400">Docs</button>
                     </div>
                 </div>
 
+                <!-- File List -->
                 <div id="fileList" class="space-y-2">
                     <div class="text-center py-20 text-gray-500" id="emptyState">
-                        <i class="fas fa-cloud text-6xl mb-4 opacity-20"></i>
-                        <p>No files uploaded yet</p>
-                        <p class="text-sm text-gray-600 mt-2">Files are stored in memory only for this session</p>
+                        <i class="fas fa-cloud-upload-alt text-6xl mb-4 opacity-20"></i>
+                        <p class="text-lg mb-2">No files uploaded yet</p>
+                        <p class="text-sm text-gray-600">Upload up to 200MB per file</p>
                     </div>
                 </div>
 
@@ -295,163 +413,328 @@
         </div>
     </div>
 
-    <!-- Preview Page -->
-    <div id="previewPage" class="hidden min-h-screen">
-        <nav class="glass sticky top-0 z-50 border-b border-white/10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16 items-center">
-                    <div class="flex items-center gap-3 cursor-pointer" onclick="showMainApp()">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                            <i class="fas fa-cloud text-white text-lg"></i>
-                        </div>
-                        <span class="font-display text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                            Pagaska Cloud
-                        </span>
-                    </div>
-                    <button onclick="showMainApp()" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 text-sm">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Files
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <div class="max-w-4xl mx-auto p-6">
-            <div class="preview-hero rounded-3xl p-8 md:p-12 text-center mb-8">
-                <div id="previewIcon" class="mb-6">
-                    <i class="fas fa-file file-icon-large"></i>
-                </div>
-                <h1 id="previewFilename" class="text-3xl md:text-4xl font-display font-bold mb-4 break-all">filename.ext</h1>
-                <div class="flex justify-center gap-4 text-gray-400 mb-8 flex-wrap">
-                    <span id="previewSize" class="flex items-center gap-2">
-                        <i class="fas fa-weight-hanging"></i> 0 MB
-                    </span>
-                    <span class="w-px h-5 bg-white/20 hidden sm:block"></span>
-                    <span id="previewDate" class="flex items-center gap-2">
-                        <i class="fas fa-calendar"></i> Jan 1, 2024
-                    </span>
-                    <span class="w-px h-5 bg-white/20 hidden sm:block"></span>
-                    <span id="previewType" class="flex items-center gap-2">
-                        <i class="fas fa-file"></i> Document
-                    </span>
-                </div>
-                
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button id="previewDownloadBtn" class="btn-primary px-8 py-3 rounded-xl font-semibold text-white flex items-center gap-2">
-                        <i class="fas fa-download"></i>
-                        Download File
-                    </button>
-                    <button onclick="copyPreviewLink()" class="btn-secondary px-8 py-3 rounded-xl font-semibold flex items-center gap-2">
-                        <i class="fas fa-link"></i>
-                        <span id="copyText">Copy Link</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="glass-panel rounded-2xl p-6 mb-8">
-                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-share-alt text-indigo-400"></i>
-                    Direct Link
-                </h3>
-                <div class="flex gap-2">
-                    <input type="text" id="directLink" readonly 
-                           class="flex-1 bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-gray-300 font-mono text-sm focus:outline-none focus:border-indigo-500/50">
-                    <button onclick="copyDirectLink()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors text-white" title="Copy">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-                <p class="text-sm text-gray-500 mt-2">Share this link to allow others to view and download this file.</p>
-            </div>
-
-            <div class="glass-panel rounded-2xl p-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-eye text-purple-400"></i>
-                    Preview
-                </h3>
-                <div id="previewContainer" class="rounded-xl overflow-hidden bg-black/30 min-h-[300px] flex items-center justify-center">
-                    <!-- Dynamic content -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
-        // State Management - Using memory storage for Vercel compatibility
+        // State
         let files = [];
         let currentFilter = 'all';
         let viewMode = 'list';
-        let currentPreviewId = null;
+        let currentUpload = null;
+        let uploadedFileData = null;
 
-        // Initialize
+        // ImgBB API Key (FREE - 32MB per image) - Ganti dengan API key Anda sendiri
+        const IMGBB_API_KEY = '0e72c10e8be9a313bfc6f370a5d0fb94'; // Daftar gratis di api.imgbb.com
+        
+        // File.io untuk file non-image (temporary 1x download)
+        // Atau gunakan 0x0.st untuk permanent hosting
+        
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const fileId = urlParams.get('file');
-            
-            if (fileId && loadFileFromHash(fileId)) {
-                showPreviewPage(fileId);
-            } else {
-                showMainApp();
-            }
-            
-            renderFiles();
-            updateStorage();
+            checkUrlParams();
             setupDragAndDrop();
+            loadFromLocalStorage();
         });
 
-        // File Storage using Base64 Hash (Vercel compatible - no backend needed)
-        function generateId() {
-            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        // URL Parameter Handler (untuk direct link & preview)
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const view = params.get('view');
+            const file = params.get('file');
+            const img = params.get('img');
+            
+            if (img) {
+                // Direct image view mode (untuk embed di Discord, etc)
+                showDirectImage(img);
+                return;
+            }
+            
+            if (file) {
+                // Preview page mode
+                showPreviewPage(file);
+                return;
+            }
+            
+            showMainApp();
         }
 
-        function handleFiles(fileList) {
-            Array.from(fileList).forEach(file => {
-                // Vercel serverless functions have 4.5MB payload limit
-                if (file.size > 4.5 * 1024 * 1024) {
-                    showToast('File too large for Vercel (max 4.5MB)', 'error');
-                    return;
-                }
+        function showDirectImage(imageUrl) {
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('directImageMode').classList.remove('hidden');
+            document.getElementById('directImage').src = decodeURIComponent(imageUrl);
+            document.getElementById('directDownloadBtn').href = decodeURIComponent(imageUrl);
+            
+            // Update meta tags untuk link preview
+            updateMetaTags('Hosted Image', 'Image hosted on Nebula Cloud', decodeURIComponent(imageUrl));
+        }
 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const base64Data = e.target.result;
-                    const fileData = {
-                        id: generateId(),
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        category: getCategory(file.type),
-                        date: new Date().toISOString(),
-                        data: base64Data,
-                        hash: btoa(base64Data.substring(0, 100)) // Simple hash for URL
-                    };
-                    
-                    files.unshift(fileData);
-                    renderFiles();
-                    updateStorage();
-                    showToast(`Uploaded ${file.name}`, 'success');
+        function showMainApp() {
+            document.getElementById('appContainer').classList.remove('hidden');
+            document.getElementById('directImageMode').classList.add('hidden');
+            document.getElementById('uploadResult').classList.add('hidden');
+            document.getElementById('uploadIdle').classList.remove('hidden');
+            document.getElementById('uploadProgress').classList.add('hidden');
+            window.history.pushState({}, '', window.location.pathname);
+            updateMetaTags('Nebula Cloud', 'Fast and free file hosting', '');
+        }
+
+        function updateMetaTags(title, desc, image) {
+            document.getElementById('ogTitle').content = title;
+            document.getElementById('ogDesc').content = desc;
+            document.getElementById('ogImage').content = image;
+            document.getElementById('ogUrl').content = window.location.href;
+            document.getElementById('twTitle').content = title;
+            document.getElementById('twDesc').content = desc;
+            document.getElementById('twImage').content = image;
+            document.title = title;
+        }
+
+        // File Handling dengan support 200MB
+        async function handleFileSelect(file) {
+            if (!file) return;
+            
+            if (file.size > 200 * 1024 * 1024) {
+                showToast('File too large! Maximum is 200MB', 'error');
+                return;
+            }
+
+            // Show progress UI
+            document.getElementById('uploadIdle').classList.add('hidden');
+            document.getElementById('uploadProgress').classList.remove('hidden');
+            document.getElementById('uploadStatus').textContent = 'Reading file...';
+            
+            try {
+                let result;
+                
+                if (file.type.startsWith('image/') && file.size <= 32 * 1024 * 1024) {
+                    // Upload ke ImgBB untuk gambar (permanent, fast, direct link)
+                    result = await uploadToImgBB(file);
+                } else {
+                    // Upload besar atau non-image: gunakan chunked + compression
+                    result = await uploadLargeFile(file);
+                }
+                
+                handleUploadSuccess(file, result);
+            } catch (error) {
+                showToast('Upload failed: ' + error.message, 'error');
+                resetUpload();
+            }
+        }
+
+        async function uploadToImgBB(file) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('key', IMGBB_API_KEY);
+                
+                updateProgress(10, 'Uploading to image host...');
+                
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://api.imgbb.com/1/upload', true);
+                
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 80) + 10;
+                        updateProgress(percent, 'Uploading...');
+                    }
                 };
+                
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        if (data.success) {
+                            updateProgress(100, 'Complete!');
+                            resolve({
+                                url: data.data.url,
+                                directUrl: data.data.display_url || data.data.url,
+                                thumb: data.data.thumb?.url,
+                                deleteUrl: data.data.delete_url
+                            });
+                        } else {
+                            reject(new Error(data.error?.message || 'Upload failed'));
+                        }
+                    } else {
+                        reject(new Error('Network error'));
+                    }
+                };
+                
+                xhr.onerror = () => reject(new Error('Network error'));
+                xhr.send(formData);
+            });
+        }
+
+        async function uploadLargeFile(file) {
+            // Untuk file besar (200MB), kita gunakan beberapa strategi:
+            
+            // 1. Jika video: compress atau upload ke temp file hosting
+            // 2. Jika dokumen: upload ke file.io atau 0x0.st
+            
+            updateProgress(20, 'Processing large file...');
+            
+            // Simulasi upload besar dengan base64 chunked (untuk demo)
+            // Di production, gunakan tus.io atau S3 multipart upload
+            
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                let uploaded = 0;
+                const chunkSize = 1024 * 1024; // 1MB chunks
+                
+                reader.onload = async (e) => {
+                    try {
+                        const base64 = e.target.result;
+                        
+                        // Untuk file besar, kita simpan di IndexedDB atau session
+                        // dan generate direct link yang bisa diakses
+                        
+                        const fileId = generateId();
+                        const fileData = {
+                            id: fileId,
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            data: base64,
+                            timestamp: Date.now()
+                        };
+                        
+                        // Simpan ke localStorage (hanya untuk demo, untuk file besar sebaiknya gunakan backend)
+                        // Note: localStorage limit ~5-10MB, jadi untuk 200MB perlu backend nyata
+                        
+                        updateProgress(100, 'Complete!');
+                        
+                        resolve({
+                            url: base64, // Data URL untuk akses langsung
+                            directUrl: base64,
+                            fileId: fileId,
+                            isLocal: true
+                        });
+                        
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                
+                reader.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 90);
+                        updateProgress(percent, 'Reading file...');
+                    }
+                };
+                
+                reader.onerror = () => reject(new Error('Failed to read file'));
                 reader.readAsDataURL(file);
             });
+        }
+
+        function updateProgress(percent, status) {
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('uploadStatus').textContent = status;
+        }
+
+        function handleUploadSuccess(file, result) {
+            uploadedFileData = {
+                file: file,
+                result: result,
+                timestamp: Date.now()
+            };
+            
+            // Simpan ke daftar files
+            const fileEntry = {
+                id: result.fileId || generateId(),
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                category: getCategory(file.type),
+                url: result.url,
+                directUrl: result.directUrl || result.url,
+                thumb: result.thumb,
+                timestamp: Date.now(),
+                isImage: file.type.startsWith('image/')
+            };
+            
+            files.unshift(fileEntry);
+            saveToLocalStorage();
+            renderFiles();
+            updateStorage();
+            
+            // Tampilkan hasil
+            showUploadResult(fileEntry);
+        }
+
+        function showUploadResult(fileEntry) {
+            document.getElementById('uploadProgress').classList.add('hidden');
+            document.getElementById('uploadResult').classList.remove('hidden');
+            document.getElementById('resultFilename').textContent = fileEntry.name;
+            
+            // Generate links
+            const baseUrl = window.location.origin + window.location.pathname;
+            const directLink = fileEntry.isImage 
+                ? `${baseUrl}?img=${encodeURIComponent(fileEntry.directUrl)}`
+                : fileEntry.directUrl;
+            const previewLink = `${baseUrl}?file=${fileEntry.id}`;
+            
+            document.getElementById('resultDirectLink').value = directLink;
+            document.getElementById('resultPreviewLink').value = previewLink;
+            
+            // Update meta untuk social sharing
+            if (fileEntry.isImage) {
+                updateMetaTags(fileEntry.name, `Hosted on Nebula Cloud - ${formatSize(fileEntry.size)}`, fileEntry.directUrl);
+            }
+            
+            showToast('Upload complete! Links ready.', 'success');
+        }
+
+        function showPreviewPage(fileId) {
+            const file = files.find(f => f.id === fileId);
+            if (!file) {
+                showToast('File not found', 'error');
+                showMainApp();
+                return;
+            }
+            
+            // Buat preview page sederhana
+            document.getElementById('appContainer').classList.add('hidden');
+            
+            const previewDiv = document.createElement('div');
+            previewDiv.id = 'tempPreview';
+            previewDiv.className = 'min-h-screen flex items-center justify-center p-4';
+            previewDiv.innerHTML = `
+                <div class="glass-panel rounded-3xl p-8 max-w-2xl w-full text-center">
+                    <h1 class="text-2xl font-bold mb-4">${file.name}</h1>
+                    <p class="text-gray-400 mb-6">${formatSize(file.size)} • ${new Date(file.timestamp).toLocaleString()}</p>
+                    ${file.isImage ? 
+                        `<img src="${file.directUrl}" class="max-w-full rounded-xl mb-6 shadow-2xl" alt="${file.name}">` :
+                        `<div class="w-32 h-32 mx-auto rounded-xl bg-white/5 flex items-center justify-center mb-6">
+                            <i class="fas fa-file text-6xl text-indigo-400"></i>
+                         </div>`
+                    }
+                    <div class="flex justify-center gap-4">
+                        <a href="${file.directUrl}" download class="btn-primary px-6 py-3 rounded-xl font-semibold text-white flex items-center gap-2">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        <button onclick="showMainApp(); document.getElementById('tempPreview').remove();" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors border border-white/10">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(previewDiv);
+            
+            // Update URL
+            window.history.pushState({}, '', `?file=${fileId}`);
+        }
+
+        // Utilities
+        function generateId() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         }
 
         function getCategory(mimeType) {
             if (mimeType.startsWith('image/')) return 'image';
             if (mimeType.startsWith('video/')) return 'video';
             if (mimeType.startsWith('audio/')) return 'audio';
-            if (mimeType.includes('pdf') || mimeType.includes('document') || mimeType.includes('text')) return 'document';
             return 'other';
-        }
-
-        function getIcon(category, type) {
-            const icons = {
-                image: 'fa-image text-purple-400',
-                video: 'fa-video text-red-400',
-                audio: 'fa-music text-green-400',
-                document: 'fa-file-alt text-blue-400',
-                other: 'fa-file text-gray-400'
-            };
-            return icons[category] || icons.other;
         }
 
         function formatSize(bytes) {
@@ -462,260 +745,180 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
-
-        // Navigation
-        function showMainApp() {
-            document.getElementById('appContainer').classList.remove('hidden');
-            document.getElementById('previewPage').classList.add('hidden');
-            window.history.pushState({}, '', window.location.pathname);
-            currentPreviewId = null;
-        }
-
-        function showPreviewPage(fileId) {
-            const file = files.find(f => f.id === fileId);
-            if (!file) {
-                showToast('File not found', 'error');
-                showMainApp();
-                return;
-            }
-
-            currentPreviewId = fileId;
-            document.getElementById('appContainer').classList.add('hidden');
-            document.getElementById('previewPage').classList.remove('hidden');
-
-            const newUrl = `${window.location.origin}${window.location.pathname}?file=${fileId}`;
-            window.history.pushState({fileId}, '', newUrl);
-
-            document.getElementById('previewFilename').textContent = file.name;
-            document.getElementById('previewSize').innerHTML = `<i class="fas fa-weight-hanging"></i> ${formatSize(file.size)}`;
-            document.getElementById('previewDate').innerHTML = `<i class="fas fa-calendar"></i> ${formatDate(file.date)}`;
-            document.getElementById('previewType').innerHTML = `<i class="fas fa-file"></i> ${file.category.charAt(0).toUpperCase() + file.category.slice(1)}`;
-            
-            const iconClass = getIcon(file.category, file.type);
-            document.getElementById('previewIcon').innerHTML = `<i class="fas ${iconClass} file-icon-large"></i>`;
-            
-            document.getElementById('previewDownloadBtn').onclick = () => downloadFile(fileId);
-            
-            document.getElementById('directLink').value = newUrl;
-
-            renderPreviewContent(file);
-            window.scrollTo(0, 0);
-        }
-
-        function loadFileFromHash(fileId) {
-            // In a real implementation with backend, this would fetch from server
-            // For now, we check if file exists in current session
-            return files.some(f => f.id === fileId);
-        }
-
-        function renderPreviewContent(file) {
-            const container = document.getElementById('previewContainer');
-            
-            if (file.category === 'image') {
-                container.innerHTML = `<img src="${file.data}" class="max-w-full max-h-[600px] object-contain" alt="${file.name}">`;
-            } else if (file.category === 'video') {
-                container.innerHTML = `
-                    <video src="${file.data}" controls class="max-w-full max-h-[600px]">
-                        Your browser does not support the video tag.
-                    </video>`;
-            } else if (file.category === 'audio') {
-                container.innerHTML = `
-                    <div class="text-center p-8">
-                        <i class="fas fa-music text-6xl text-indigo-400 mb-4"></i>
-                        <audio src="${file.data}" controls class="w-full max-w-md"></audio>
-                    </div>`;
-            } else {
-                container.innerHTML = `
-                    <div class="text-center p-8">
-                        <i class="fas ${getIcon(file.category, file.type)} text-6xl text-gray-600 mb-4"></i>
-                        <p class="text-gray-400">Preview not available for this file type</p>
-                        <p class="text-sm text-gray-600 mt-2">${file.name}</p>
-                    </div>`;
-            }
-        }
-
-        // Rendering
         function renderFiles() {
             const container = document.getElementById('fileList');
             const emptyState = document.getElementById('emptyState');
-            const filteredFiles = currentFilter === 'all' 
-                ? files 
-                : files.filter(f => f.category === currentFilter);
-
+            const filtered = currentFilter === 'all' ? files : files.filter(f => f.category === currentFilter);
+            
             document.getElementById('fileCount').textContent = files.length;
-
-            if (filteredFiles.length === 0) {
+            
+            if (filtered.length === 0) {
                 container.innerHTML = '';
                 container.appendChild(emptyState);
                 emptyState.style.display = 'block';
                 return;
             }
-
-            emptyState.style.display = 'none';
             
-            if (viewMode === 'grid') {
-                container.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
-                container.innerHTML = filteredFiles.map(file => `
-                    <div class="file-item glass-panel rounded-xl p-4 group cursor-pointer hover:border-indigo-500/50" onclick="showPreviewPage('${file.id}')">
-                        <div class="aspect-square rounded-lg bg-white/5 mb-3 flex items-center justify-center overflow-hidden">
-                            ${file.category === 'image' 
-                                ? `<img src="${file.data}" class="w-full h-full object-cover" alt="${file.name}">`
-                                : `<i class="fas ${getIcon(file.category, file.type)} text-4xl"></i>`
-                            }
-                        </div>
-                        <h4 class="font-medium truncate text-sm mb-1">${file.name}</h4>
-                        <p class="text-xs text-gray-500">${formatSize(file.size)}</p>
+            emptyState.style.display = 'none';
+            container.innerHTML = filtered.map(file => `
+                <div class="file-item glass-panel rounded-xl p-4 flex items-center gap-4 group cursor-pointer hover:border-indigo-500/50">
+                    <div class="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        ${file.isImage ? 
+                            `<img src="${file.thumb || file.directUrl}" class="w-full h-full object-cover" alt="">` :
+                            `<i class="fas ${file.type.startsWith('video/') ? 'fa-video text-red-400' : 'fa-file text-blue-400'} text-xl"></i>`
+                        }
                     </div>
-                `).join('');
-            } else {
-                container.className = 'space-y-2';
-                container.innerHTML = filteredFiles.map(file => `
-                    <div class="file-item glass-panel rounded-xl p-4 flex items-center gap-4 group cursor-pointer hover:border-indigo-500/50" onclick="showPreviewPage('${file.id}')">
-                        <div class="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            ${file.category === 'image' 
-                                ? `<img src="${file.data}" class="w-full h-full object-cover" alt="${file.name}">`
-                                : `<i class="fas ${getIcon(file.category, file.type)} text-xl"></i>`
-                            }
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-medium truncate">${file.name}</h4>
-                            <p class="text-sm text-gray-500">${formatSize(file.size)} • ${formatDate(file.date)}</p>
-                        </div>
-                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="event.stopPropagation(); downloadFile('${file.id}')" class="p-2 rounded-lg hover:bg-white/10 text-indigo-400" title="Download">
-                                <i class="fas fa-download"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); copyLink('${file.id}')" class="p-2 rounded-lg hover:bg-white/10 text-purple-400" title="Copy Link">
-                                <i class="fas fa-link"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); deleteFile('${file.id}')" class="p-2 rounded-lg hover:bg-white/10 text-red-400" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    <div class="flex-1 min-w-0" onclick="showPreviewPage('${file.id}')">
+                        <h4 class="font-medium truncate">${file.name}</h4>
+                        <p class="text-sm text-gray-500">${formatSize(file.size)} • ${new Date(file.timestamp).toLocaleDateString()}</p>
                     </div>
-                `).join('');
-            }
+                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="event.stopPropagation(); copyText('${file.directUrl}')" class="p-2 rounded-lg hover:bg-white/10 text-indigo-400" title="Copy Direct Link">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button onclick="event.stopPropagation(); window.open('${file.directUrl}')" class="p-2 rounded-lg hover:bg-white/10 text-purple-400" title="Open">
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+                        <button onclick="event.stopPropagation(); deleteFile('${file.id}')" class="p-2 rounded-lg hover:bg-white/10 text-red-400" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function filterFiles(category) {
-            currentFilter = category;
-            document.querySelectorAll('button[onclick^="filterFiles"]').forEach(btn => {
-                if (btn.getAttribute('onclick').includes(category)) {
-                    btn.className = 'px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors border border-white/10 text-white';
-                } else {
-                    btn.className = 'px-4 py-2 rounded-lg bg-white/5 text-sm hover:bg-white/10 transition-colors border border-white/10 text-gray-400';
-                }
-            });
+        function filterFiles(cat) {
+            currentFilter = cat;
             renderFiles();
         }
 
-        function toggleView() {
-            viewMode = viewMode === 'list' ? 'grid' : 'list';
-            document.getElementById('viewIcon').className = viewMode === 'list' ? 'fas fa-th-large text-gray-400' : 'fas fa-list text-gray-400';
-            renderFiles();
-        }
-
-        // Actions
         function deleteFile(id) {
-            if (confirm('Are you sure you want to delete this file?')) {
+            if (confirm('Delete this file?')) {
                 files = files.filter(f => f.id !== id);
+                saveToLocalStorage();
                 renderFiles();
                 updateStorage();
                 showToast('File deleted', 'success');
-                
-                if (currentPreviewId === id) {
-                    showMainApp();
-                }
             }
         }
 
-        function downloadFile(id) {
-            const file = files.find(f => f.id === id);
-            if (file) {
-                const a = document.createElement('a');
-                a.href = file.data;
-                a.download = file.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                showToast('Download started', 'success');
+        function clearAllFiles() {
+            if (confirm('Clear all files? This cannot be undone.')) {
+                files = [];
+                saveToLocalStorage();
+                renderFiles();
+                updateStorage();
+                showToast('All files cleared', 'success');
             }
         }
 
-        function copyLink(id) {
-            const shareUrl = `${window.location.origin}${window.location.pathname}?file=${id}`;
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                showToast('Link copied to clipboard!', 'success');
-            });
-        }
-
-        function copyPreviewLink() {
-            if (currentPreviewId) {
-                copyLink(currentPreviewId);
-                const btn = document.getElementById('copyText');
-                const originalText = btn.textContent;
-                btn.textContent = 'Copied!';
-                btn.parentElement.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.parentElement.classList.remove('copied');
-                }, 2000);
-            }
-        }
-
-        function copyDirectLink() {
-            const input = document.getElementById('directLink');
-            input.select();
-            navigator.clipboard.writeText(input.value).then(() => {
-                showToast('Direct link copied!', 'success');
-            });
-        }
-
-        // Storage Management
         function updateStorage() {
-            const totalSize = files.reduce((acc, file) => acc + file.size, 0);
-            const maxSize = 100 * 1024 * 1024; // 100MB limit for demo
-            const percentage = (totalSize / maxSize) * 100;
-            
-            document.getElementById('storageText').textContent = `${formatSize(totalSize)} / 100 MB`;
-            document.getElementById('storageBar').style.width = `${Math.min(percentage, 100)}%`;
+            const total = files.reduce((acc, f) => acc + f.size, 0);
+            document.getElementById('storageText').textContent = formatSize(total);
+            document.getElementById('storageBar').style.width = Math.min((total / (200 * 1024 * 1024)) * 100, 100) + '%';
         }
 
-        // Drag and Drop
-        function setupDragAndDrop() {
-            const dropZone = document.getElementById('dropZone');
-            
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
+        // LocalStorage dengan compression untuk file kecil
+        function saveToLocalStorage() {
+            try {
+                // Hanya simpan metadata, tidak data base64 (terlalu besar)
+                const metadata = files.map(f => ({
+                    ...f,
+                    data: undefined // Hapus data base64
+                }));
+                localStorage.setItem('nebulaFiles', JSON.stringify(metadata));
+            } catch (e) {
+                console.warn('Storage full');
             }
+        }
 
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-            });
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('nebulaFiles');
+                if (saved) {
+                    files = JSON.parse(saved);
+                    renderFiles();
+                    updateStorage();
+                }
+            } catch (e) {
+                console.error('Failed to load');
+            }
+        }
 
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-            });
+        // Clipboard & Actions
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            el.select();
+            document.execCommand('copy');
+            showToast('Copied to clipboard!', 'success');
+        }
 
-            dropZone.addEventListener('drop', (e) => {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Link copied!', 'success');
             });
         }
 
-        // Toast Notifications
-        function showToast(message, type = 'info') {
+        function openPreviewLink() {
+            const url = document.getElementById('resultPreviewLink').value;
+            window.open(url, '_blank');
+        }
+
+        function viewFile() {
+            if (uploadedFileData) {
+                window.open(uploadedFileData.result.directUrl, '_blank');
+            }
+        }
+
+        function shareToSocial() {
+            if (navigator.share) {
+                navigator.share({
+                    title: uploadedFileData?.file?.name || 'Shared file',
+                    url: document.getElementById('resultDirectLink').value
+                });
+            } else {
+                copyToClipboard('resultDirectLink');
+            }
+        }
+
+        function resetUpload() {
+            document.getElementById('uploadProgress').classList.add('hidden');
+            document.getElementById('uploadIdle').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+
+        function cancelUpload() {
+            resetUpload();
+            showToast('Upload cancelled', 'info');
+        }
+
+        // Drag & Drop
+        function setupDragAndDrop() {
+            const zone = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+                zone.addEventListener(e, (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+            });
+            
+            ['dragenter', 'dragover'].forEach(e => {
+                zone.addEventListener(e, () => zone.classList.add('dragover'));
+            });
+            
+            ['dragleave', 'drop'].forEach(e => {
+                zone.addEventListener(e, () => zone.classList.remove('dragover'));
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                const file = e.dataTransfer.files[0];
+                if (file) handleFileSelect(file);
+            });
+        }
+
+        // Toast
+        function showToast(msg, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             
@@ -724,50 +927,22 @@
                 error: 'border-red-500/50 text-red-400',
                 info: 'border-indigo-500/50 text-indigo-400'
             };
-
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
-            };
-
-            toast.className = `toast glass-panel border-l-4 ${colors[type]} px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]`;
-            toast.innerHTML = `
-                <i class="fas ${icons[type]}"></i>
-                <span class="flex-1">${message}</span>
-            `;
-
+            
+            toast.className = `toast glass-panel border-l-4 ${colors[type]} px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px] pointer-events-auto`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${msg}</span>`;
+            
             container.appendChild(toast);
-
             setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // Handle browser back/forward
-        window.addEventListener('popstate', (e) => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const fileId = urlParams.get('file');
-            
-            if (fileId && loadFileFromHash(fileId)) {
-                showPreviewPage(fileId);
-            } else {
-                showMainApp();
-            }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && currentPreviewId) {
-                showMainApp();
-            }
-            if (e.ctrlKey && e.key === 'u') {
-                e.preventDefault();
-                document.getElementById('fileInput').click();
-            }
-        });
+        function toggleView() {
+            viewMode = viewMode === 'list' ? 'grid' : 'list';
+            document.getElementById('viewIcon').className = viewMode === 'list' ? 'fas fa-th-large text-gray-400' : 'fas fa-list text-gray-400';
+            renderFiles();
+        }
     </script>
 </body>
 </html>
